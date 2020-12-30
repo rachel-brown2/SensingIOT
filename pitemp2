@@ -1,36 +1,36 @@
-import time
-# Import SPI library (for hardware SPI) and MCP3008 library.
-import Adafruit_GPIO.SPI as SPI
-import Adafruit_MCP3008
-timeout = 1.5
-last_touch = 0
-# Software SPI configuration:
-# CLK  = 18
-# MISO = 23
-# MOSI = 24
-# CS   = 25
-# mcp = Adafruit_MCP3008.MCP3008(clk=CLK, cs=CS, miso=MISO, mosi=MOSI)
-def test():
-    print("Touch Detected")
-# Hardware SPI configuration:
-SPI_PORT   = 0
-SPI_DEVICE = 0
-mcp = Adafruit_MCP3008.MCP3008(spi=SPI.SpiDev(SPI_PORT, SPI_DEVICE))
-print('Press Ctrl-C to quit...')
-while True:
-    # Grab the difference between channel 0 and 1 (i.e. channel 0 minus 1).
-    # Note you can specify any value in 0-7 to grab other differences:
-    #  - 0: Return channel 0 minus channel 1
-    #  - 1: Return channel 1 minus channel 0
-    #  - 2: Return channel 2 minus channel 3
-    #  - 3: Return channel 3 minus channel 2
-    #  - 4: Return channel 4 minus channel 5
-    #  - 5: Return channel 5 minus channel 4
-    #  - 6: Return channel 6 minus channel 7
-    #  - 7: Return channel 7 minus channel 6
-    value = mcp.read_adc_difference(0)
-    print('Channel 0 minus 1: {0}'.format(value))
-    if value > 0 and last_touch + timeout < time.time():
-        test()
-        last_touch = time.time()
-    time.sleep(0.5)
+##
+ # Maker's Digest
+ # DHTxx Temperature and Humidity Example.
+ #
+ # Dont forget to install Adafruit_DHT! See README.md for details.
+##
+import sys
+from time import sleep  # Import Sleep module from time library
+import Adafruit_DHT     # Import the Adafruit_DHT module
+
+pin = 4                 # Set pin to pin 4
+dly = 2                 # Set delay to 2000ms (2 seconds) Can be changed to 1 for DHT22
+sensor_type = 22        # Sensor type: Change this to 22 if using DHT22, or leave
+                        # at 11 for DHT11
+
+
+try: 
+    while True:
+        # Introduce our delay
+        sleep(dly)
+        
+        # Read from sensor
+        humidity, temperature = Adafruit_DHT.read_retry(sensor_type, pin)
+
+        # Sensor defaults to Celsius, convert to Fahrenheit. 
+        fahrenheit = (temperature * 1.8) + 32
+        celsius = temperature
+
+        # Check if data from sensor read is valid. Print data if it is. Else, fail.
+        if humidity is not None or temperature is not None:
+            print 'Temperature: ({0:0.1f}C) ({1:0.1f}F) Humidity: {2:0.1f}%'.format(celsius, fahrenheit, humidity)
+        else:
+            print 'Cannot read from device'
+
+except KeyboardInterrupt:
+    sys.exit()
