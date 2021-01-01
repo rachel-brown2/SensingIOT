@@ -49,9 +49,9 @@ LDR_value=[0] #sets the initial value of the LDR to 0
 
 LDR_value = mcp.read_adc(0) #getting the value from the LDR which is connected to a 1k resistor
 
-with open('/home/pi/Documents/model1.pkl', 'rb') as f:
+with open('/home/pi/Documents/model_01.pkl', 'rb') as f:
     svc=pickle.load(f) #the daytime model
-with open('/home/pi/Documents/model1.pkl', 'rb') as f:
+with open('/home/pi/Documents/model01.pkl', 'rb') as f:
     svcN=pickle.load(f) #the nightime model 
 
     
@@ -62,7 +62,7 @@ with open('/home/pi/Documents/model1.pkl', 'rb') as f:
 
 camera = PiCamera()
 
-timeout = time.time() + 60*60  #running for 10 days 
+timeout = time.time() + 60*60*24*7  #running for 7 days 
 
 # Setting up google sheets
 
@@ -116,7 +116,7 @@ request=service.spreadsheets().values().append(spreadsheetId=spreadsheetID, rang
 request.execute()
 
 # camera.start_preview()
-
+camera.resolution = (1280, 720)
 weatherAPItime = datetime.datetime(1999,1,1,00,00,00)
 cell_range_insert='TrafficData!A1'
 
@@ -124,15 +124,15 @@ while (time.time()<timeout):
     current_time = datetime.datetime.now()
     
     # ***** CAMERA CODE ****
-    camera.capture('/home/pi/Desktop/ori_%s.jpg' % current_time.strftime("%d%m%Y_%H%M%S"))
-    current_image = '/home/pi/Desktop/ori_%s.jpg' % current_time.strftime("%d%m%Y_%H%M%S")
+    camera.capture('/media/pi/RACHEL/SIOT/ori_%s.png' % current_time.strftime("%d%m%Y_%H%M%S"))
+    current_image = '/media/pi/RACHEL/SIOT/ori_%s.png' % current_time.strftime("%d%m%Y_%H%M%S")
     if (LDR_value >100):
         img0, rect = process_frame(mpimg.imread(current_image),svc)
-        plt.imsave('/home/pi/Desktop/ML_%s.jpg' % current_time.strftime("%d%m%Y_%H%M%S"),img0,cmap="gray")
+        plt.imsave('/media/pi/RACHEL/SIOT/ori_%s.png' % current_time.strftime("%d%m%Y_%H%M%S"),img0,cmap="gray")
         CameraData = ((current_time.strftime("%d%m%Y_%H%M%S"), len(rect),'Day'),('','',''))
     else:
         img0, rect = process_frame(mpimg.imread(current_image),svcN)
-        plt.imsave('/home/pi/Desktop/ML_%s.jpg' % current_time.strftime("%d%m%Y_%H%M%S"),img0,cmap="gray")
+        plt.imsave('/media/pi/RACHEL/SIOT/ori_%s.png' % current_time.strftime("%d%m%Y_%H%M%S"),img0,cmap="gray")
         CameraData = ((current_time.strftime("%d%m%Y_%H%M%S"), len(rect),'Night'),('','',''))
     
     value_range_body = {'majorDimension': 'ROWS','values': CameraData}
@@ -160,5 +160,3 @@ while (time.time()<timeout):
             print ('Cannot read from device')
 
         cell_range_insert='TrafficData!A1'
-        
-    sleep(2)
