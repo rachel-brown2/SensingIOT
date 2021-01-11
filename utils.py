@@ -146,20 +146,6 @@ def find_cars(img, ystart, ystop, scale, cspace, hog_channel, svc, X_scaler, ori
                 
     return rectangles
 
-def draw_boxes(img, bboxes, color=(0, 0, 255), thick=6):
-    # Make a copy of the image
-    imcopy = np.copy(img)
-    random_color = False
-    # Iterate through the bounding boxes
-    for bbox in bboxes:
-        if color == 'random' or random_color:
-            color = (np.random.randint(0,255), np.random.randint(0,255), np.random.randint(0,255))
-            random_color = True
-        # Draw a rectangle given bbox coordinates
-        cv2.rectangle(imcopy, bbox[0], bbox[1], color, thick)
-    # Return the image copy with boxes drawn
-    return imcopy
-
 def draw_labeled_bboxes(img, labels):
     # Iterate through all detected cars
     rects = []
@@ -214,50 +200,43 @@ def process_frame(img, svc):
     ystart = 416
     ystop = 480
     scale = 1.0
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
     # Set dimentions for rectangle layer
     ystart = 400
     ystop = 496
     scale = 1.5
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
     # Set dimentions for rectangle layer
     ystart = 432
     ystop = 528
     scale = 1.5
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
     # Set dimentions for rectangle layer
     ystart = 400
     ystop = 528
     scale = 2.0
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
     # Set dimentions for rectangle layer
     ystart = 432
     ystop = 560
     scale = 2.0
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
     # Set dimentions for rectangle layer
     ystart = 400
     ystop = 596
     scale = 3.5
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
     
   # Set dimentions for rectangle layer
     ystart = 464
     ystop = 660
     scale = 3.5
-    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, 
-                           orient, pix_per_cell, cell_per_block, None, None))
+    rectangles.append(find_cars(img, ystart, ystop, scale, colorspace, hog_channel, svc, None, orient, pix_per_cell, cell_per_block, None, None))
 
 
     # Flatten list of lists
@@ -278,19 +257,8 @@ def process_frame(img, svc):
 
 def londonWeather():
     w = requests.get('http://api.openweathermap.org/data/2.5/weather?q=London&appid=bfb86295e5a377499d0da0ad5dd50381')
-    Weatherdata = w.json()
-    #print(Weatherdata)
+    Weatherdata = w.json() #the weather API data is in Jason format 
     LondonTempC = float(Weatherdata['main']['temp'])- 273.15
-    # LondonTempC = float(LondonTempK )
-    #print('{:.2f}'.format(LondonTempC))
     LondonWeatherDescription = Weatherdata ['weather'][0]['description']
     return LondonTempC, LondonWeatherDescription
-    
 
-def updateSheets(timenow, LondonTempC, LondonWeatherDescription, service, spreadsheetID, cell_range_insert):
-    Bodyinfo = ((timenow.strftime("%d/%m/%Y"), timenow.strftime("%H:%M:%S"),LondonWeatherDescription,'{:.2f}'.format(LondonTempC)),('','','',''))
-    value_range_body = {
-        'majorDimension': 'ROWS',
-        'values': Bodyinfo}
-    request=service.spreadsheets().values().append(spreadsheetId=spreadsheetID, range=cell_range_insert, valueInputOption='USER_ENTERED', body=value_range_body)
-    request.execute()
